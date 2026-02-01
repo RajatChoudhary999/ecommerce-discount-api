@@ -3,6 +3,9 @@ const dotenv = require("dotenv");
 const connectToDatabase = require("./config/dbConnection");
 const User = require("./routes/userRoutes");
 const Task = require("./routes/taskRoutes");
+const Cart = require("./routes/cartRoutes");
+const Checkout = require("./routes/checkoutRoutes");
+const Admin = require("./routes/adminRoutes");
 const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 const syncModels = require("./config/syncModels");
 const cors = require("cors");
@@ -11,7 +14,7 @@ require("dotenv").config();
 
 //DB Work
 require("./config/dbConnection");
-syncModels();
+// syncModels();
 
 const app = express();
 app.use(express.json()); // to Accept Json Data
@@ -31,8 +34,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/user", User);
-app.use("/api/task", Task);
+// app.use("/api/user", User);
+// app.use("/api/task", Task);
+app.use("/api/cart", Cart);
+app.use("/api/checkout", Checkout);
+app.use("/api/admin", Admin);
 
 //If no routes exist it will fall on this
 app.use(notFound);

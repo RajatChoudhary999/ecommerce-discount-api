@@ -1,88 +1,95 @@
-# Employee Task Tracker
+# Ecommerce Cart + Discount Coupon API
 
-A full-stack application that allows admins to manage employees and assign tasks, and allows employees to view and update their assigned task status.
+Backend API for an ecommerce store where users can add items to a cart and checkout to place orders.  
+Every **nth order** generates a **10% discount coupon**, which can be applied once on the next checkout.
 
 ---
 
 ## Tech Stack
 
-### Backend
 - Node.js
 - Express.js
-- PostgreSQL
-- Sequelize ORM
-- JWT Authentication
-- Role-based access control
-
-### Frontend
-- React (Vite)
-- Tailwind CSS
-- Material UI (MUI)
-- Axios
-- React Router
+- In-memory data store (no database)
 
 ---
 
-## Features
+## Features Implemented
 
-### Admin
-- Login with JWT authentication
-- View all employees
-- Create and assign tasks to employees
-- View all tasks with assigned employee details
+### Cart APIs
 
-### Employee
-- Login with JWT authentication
-- View assigned tasks
-- Update task status (Pending → In Progress → Completed)
+- Add items to cart
+- View cart with total amount
+- Remove items from cart
+
+### Checkout API
+
+- Places an order successfully
+- Validates optional discount code
+- Applies 10% discount only when the active coupon is valid
+
+### Discount Coupon Rule
+
+- Every **nth successful order** generates a coupon code
+- Only **one active coupon** exists at a time
+- Coupon can be used **only once**
+- Invalid/expired coupon returns an error
+
+### Admin APIs
+
+- Fetch current active discount code
+- View purchase statistics:
+  - Total items purchased
+  - Total purchase amount
+  - Issued discount codes
+  - Total discount amount
 
 ---
 
 ## Project Structure
-Assignment/
-├── backend/
-├── frontend/
-|── postman/
-└── README.md
 
-## Setup Instructions
+# Ecommerce Cart + Discount Coupon API
 
-### 1️⃣ Clone the repository
+Backend API for an ecommerce store where users can add items to a cart and checkout to place orders.  
+Every **nth order** generates a **10% discount coupon**, which can be applied once on the next checkout.
 
-```bash
-git clone <repository-url>
-cd Assignment
+---
 
-cd backend
-npm install
+## Tech Stack
 
-Create a .env file inside the backend folder:
-PORT=5000
-JWT_SECRET=your_jwt_secret
-DB_HOST=localhost
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_NAME=testdb
-DB_PORT=5432
+- Node.js
+- Express.js
+- In-memory data store (no database)
 
-## Frontend 
-will run on: http://localhost:5173
+---
 
+## Features Implemented
 
-## Database
+### Cart APIs
 
-PostgreSQL is used as the database
+- Add items to cart
+- View cart with total amount
+- Remove items from cart
 
-SQL schema is provided in:
+### Checkout API
 
-backend/database/schema.sql
+- Places an order successfully
+- Validates optional discount code
+- Applies 10% discount only when the active coupon is valid
 
+### Discount Coupon Rule
 
-## API Documentation
+- Every **nth successful order** generates a coupon code
+- Only **one active coupon** exists at a time
+- Coupon can be used **only once**
+- Invalid/expired coupon returns an error
 
-A Postman collection is provided to test all APIs:
+### Admin APIs
 
-postman/employee-task-tracker.postman_collection.json
+- Fetch current active discount code
+- View purchase statistics:
+  - Total items purchased
+  - Total purchase amount
+  - Issued discount codes
+  - Total discount amount
 
-Import the collection into Postman and set the Authorization header with the JWT token after login.
-
+---
