@@ -2,21 +2,44 @@
   "info": {
     "_postman_id": "61627f06-8591-4295-8249-c7a51ad88d84",
     "name": "Ecommerce Cart",
+    "description": "Comprehensive Postman collection for manual verification of Cart, Checkout, Idempotency, Orders, Milestone Coupons, and Admin Reporting.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "24357947"
   },
   "item": [
     {
-      "name": "Cart",
+      "name": "1. Cart",
       "item": [
         {
-          "name": "Add to Cart",
+          "name": "Create Cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.cart && json.cart.id) {",
+                  "        pm.collectionVariables.set('cartId', json.cart.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"userId\": \"u1\",\r\n  \"productId\":3,\r\n  \"qty\": 1\r\n}",
+              "raw": "{\n  \"userId\": \"u1\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -24,50 +47,68 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/cart/add",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/cart",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
+              "path": [
+                "api",
+                "cart"
+              ]
+            },
+            "description": "Initializes or fetches an active cart for the specified userId."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u1\",\n  \"productId\": {{productId}},\n  \"qty\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "api",
                 "cart",
                 "add"
               ]
-            }
+            },
+            "description": "Adds a valid quantity of a catalog product to the user's active cart. Validates available stock."
           },
           "response": []
         },
         {
-          "name": "Get Cart Details",
+          "name": "Update Item Quantity",
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:5000/api/cart/u3",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "cart",
-                "u3"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Cart",
-          "request": {
-            "method": "DELETE",
-            "header": [],
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"userId\": \"u1\",\r\n  \"productId\": 2\r\n}",
+              "raw": "{\n  \"userId\": \"u1\",\n  \"productId\": {{productId}},\n  \"qty\": 3\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -75,34 +116,128 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/cart/remove",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/cart/update",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
+              "path": [
+                "api",
+                "cart",
+                "update"
+              ]
+            },
+            "description": "Modifies quantity for an item already in cart. Setting qty to 0 removes the item."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/u1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "u1"
+              ]
+            },
+            "description": "Retrieves the active cart for the user, enriched with current product names, live catalog prices, available inventory, and subtotals."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u1\",\n  \"productId\": {{productId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/remove",
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "api",
                 "cart",
                 "remove"
               ]
-            }
+            },
+            "description": "Removes an item completely from the user's active cart."
           },
           "response": []
         }
       ]
     },
     {
-      "name": "Checkout",
+      "name": "2. Checkout",
       "item": [
         {
-          "name": "Checkout Cart",
+          "name": "Successful Checkout",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Ensure user u1 has at least 1 item in cart before checkout",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get('baseUrl') + '/api/cart/add',",
+                  "    method: 'POST',",
+                  "    header: { 'Content-Type': 'application/json' },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({ userId: 'u1', productId: 1, qty: 1 })",
+                  "    }",
+                  "}, function (err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.order && json.order.orderId) {",
+                  "        pm.collectionVariables.set('orderId', json.order.orderId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"userId\": \"u3\"\r\n//    \"discountCode\":\"SAVE10-fec11d\"\r\n}",
+              "raw": "{\n  \"userId\": \"u1\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -110,68 +245,543 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/checkout",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/checkout",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "checkout"
               ]
+            },
+            "description": "Standard checkout. Validates stock, deducts inventory, transitions cart to CHECKED_OUT, and creates an immutable order snapshot."
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout with Idempotency-Key",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Ensure u_idemp has an item in cart",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get('baseUrl') + '/api/cart/add',",
+                  "    method: 'POST',",
+                  "    header: { 'Content-Type': 'application/json' },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({ userId: 'u_idemp', productId: 4, qty: 1 })",
+                  "    }",
+                  "}, function (err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
             }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u_idemp\",\n  \"idempotencyKey\": \"{{idempotencyKey}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            },
+            "description": "Initial checkout attempt supplying an Idempotency-Key. Creates order and stores response in idempotency cache."
+          },
+          "response": []
+        },
+        {
+          "name": "Repeat checkout with same Idempotency-Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u_idemp\",\n  \"idempotencyKey\": \"{{idempotencyKey}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            },
+            "description": "Idempotency retry. Sends identical payload and Idempotency-Key. Safely returns cached order with HTTP 201 (idempotentReplay: true) without creating a second order or deducting inventory twice."
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout with insufficient inventory",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// 1. Add Headphones (productId: 5, stock: 1) to user u_stockout's cart",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get('baseUrl') + '/api/cart/add',",
+                  "    method: 'POST',",
+                  "    header: { 'Content-Type': 'application/json' },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({ userId: 'u_stockout', productId: 5, qty: 1 })",
+                  "    }",
+                  "}, function () {",
+                  "    // 2. Concurrently buy the last headphone with another user u_competing to deplete stock to 0",
+                  "    pm.sendRequest({",
+                  "        url: pm.collectionVariables.get('baseUrl') + '/api/cart/add',",
+                  "        method: 'POST',",
+                  "        header: { 'Content-Type': 'application/json' },",
+                  "        body: {",
+                  "            mode: 'raw',",
+                  "            raw: JSON.stringify({ userId: 'u_competing', productId: 5, qty: 1 })",
+                  "        }",
+                  "    }, function () {",
+                  "        pm.sendRequest({",
+                  "            url: pm.collectionVariables.get('baseUrl') + '/api/checkout',",
+                  "            method: 'POST',",
+                  "            header: { 'Content-Type': 'application/json' },",
+                  "            body: {",
+                  "                mode: 'raw',",
+                  "                raw: JSON.stringify({ userId: 'u_competing' })",
+                  "            }",
+                  "        }, function () {});",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u_stockout\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            },
+            "description": "Attempts to checkout when requested quantity exceeds available catalog inventory (e.g. stock bought by another customer). Rejects with HTTP 409 Conflict."
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout an already completed cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            },
+            "description": "Attempts to check out for a user whose cart was already finalized. Rejects because a completed cart cannot checkout more than once."
           },
           "response": []
         }
       ]
     },
     {
-      "name": "Admin",
+      "name": "3. Orders",
       "item": [
+        {
+          "name": "Get order by order ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout/{{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout",
+                "{{orderId}}"
+              ]
+            },
+            "description": "Fetches historical order details and frozen snapshot data (product pricing, quantities, applied discounts, totals) by orderId."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Coupons",
+      "item": [
+        {
+          "name": "Attempt coupon generation before milestone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/generate-coupon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "generate-coupon"
+              ]
+            },
+            "description": "Attempts administrative coupon generation before the order milestone (e.g. 5 orders) is reached. Rejects with HTTP 400 Bad Request."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate coupon when milestone is eligible",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Helper: ensures at least 5 orders are placed so milestone 1 is eligible",
+                  "for (var i = 1; i <= 5; i++) {",
+                  "    (function(idx) {",
+                  "        var u = 'u_milestone_' + idx + '_' + Date.now();",
+                  "        pm.sendRequest({",
+                  "            url: pm.collectionVariables.get('baseUrl') + '/api/cart/add',",
+                  "            method: 'POST',",
+                  "            header: { 'Content-Type': 'application/json' },",
+                  "            body: {",
+                  "                mode: 'raw',",
+                  "                raw: JSON.stringify({ userId: u, productId: 4, qty: 1 })",
+                  "            }",
+                  "        }, function () {",
+                  "            pm.sendRequest({",
+                  "                url: pm.collectionVariables.get('baseUrl') + '/api/checkout',",
+                  "                method: 'POST',",
+                  "                header: { 'Content-Type': 'application/json' },",
+                  "                body: {",
+                  "                    mode: 'raw',",
+                  "                    raw: JSON.stringify({ userId: u })",
+                  "                }",
+                  "            }, function () {});",
+                  "        });",
+                  "    })(i);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.coupon && json.coupon.code) {",
+                  "        pm.collectionVariables.set('couponCode', json.coupon.code);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/generate-coupon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "generate-coupon"
+              ]
+            },
+            "description": "Generates a 10% discount coupon for an eligible milestone (e.g., 5th order). Returns HTTP 201 Created and saves couponCode to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout using a valid coupon",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Ensure u_coupon_user has Shirt (1000) in cart",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get('baseUrl') + '/api/cart/add',",
+                  "    method: 'POST',",
+                  "    header: { 'Content-Type': 'application/json' },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({ userId: 'u_coupon_user', productId: 1, qty: 1 })",
+                  "    }",
+                  "}, function (err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u_coupon_user\",\n  \"discountCode\": \"{{couponCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            },
+            "description": "Applies a valid milestone coupon at checkout. Verifies 10% discount deduction and transitions coupon status to REDEEMED."
+          },
+          "response": []
+        },
+        {
+          "name": "Attempt to redeem an already redeemed coupon",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Ensure u_coupon_user_2 has an item in cart",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get('baseUrl') + '/api/cart/add',",
+                  "    method: 'POST',",
+                  "    header: { 'Content-Type': 'application/json' },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({ userId: 'u_coupon_user_2', productId: 1, qty: 1 })",
+                  "    }",
+                  "}, function (err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"u_coupon_user_2\",\n  \"discountCode\": \"{{couponCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            },
+            "description": "Single-use enforcement. Attempts to redeem the same coupon code again. Rejects with HTTP 400 Bad Request ('Invalid or expired discount code')."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Admin",
+      "item": [
+        {
+          "name": "Get admin stats report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "stats"
+              ]
+            },
+            "description": "Read-only summary report returning purchased quantity by product, gross revenue, discounts granted, net revenue, order count, and coupon counts. Fully reconciles with orders and never mutates state."
+          },
+          "response": []
+        },
         {
           "name": "Get current active discount code",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/admin/discount-code",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/admin/discount-code",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "admin",
                 "discount-code"
               ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Order Stats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:5000/api/admin/stats",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "admin",
-                "stats"
-              ]
-            }
+            },
+            "description": "Fetches the current active, unredeemed discount code if one is currently available."
           },
           "response": []
         }
       ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "cartId",
+      "value": "cart_1",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "couponCode",
+      "value": "SAVE10-ABC123",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "idemp-key-test-001",
+      "type": "string"
     }
   ]
 }
